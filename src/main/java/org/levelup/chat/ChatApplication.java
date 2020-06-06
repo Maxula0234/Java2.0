@@ -22,7 +22,7 @@ public class ChatApplication {
         System.out.println("********************************************************************************************************");
         System.out.println("********************************************************************************************************");
 
-        usersDao.createUsers("enot","lisovsky");
+        usersDao.removeById(13);
         HibernateUtils.getFactory().close();
     }
 

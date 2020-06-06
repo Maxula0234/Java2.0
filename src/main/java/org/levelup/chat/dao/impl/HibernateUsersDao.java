@@ -9,6 +9,7 @@ import org.levelup.chat.domain.Users;
 import org.levelup.chat.hibernate.HibernateUtils;
 import org.levelup.chat.jdbc.DatabaseConnectionFactory;
 
+import javax.persistence.criteria.CriteriaDelete;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -44,9 +45,11 @@ public class HibernateUsersDao implements UsersDao {
     @Override
     public void removeById(int id) {
         try(Session session = factory.openSession()){
-            session.createQuery("DELETE Users where id = :idUsers", Users.class)
-                    .setParameter(1,String.valueOf(id))
+            Transaction transaction = session.beginTransaction();
+            session.createQuery("DELETE Users where id = :idUsers")
+                    .setParameter("idUsers",id)
                     .executeUpdate();
+            transaction.commit();
         }
     }
 
