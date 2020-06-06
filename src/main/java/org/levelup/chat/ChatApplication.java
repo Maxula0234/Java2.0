@@ -5,11 +5,9 @@ import org.levelup.chat.dao.ChannelDao;
 import org.levelup.chat.dao.UsersDao;
 import org.levelup.chat.dao.impl.HibernateChannelDao;
 import org.levelup.chat.dao.impl.HibernateUsersDao;
-import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.Users;
 import org.levelup.chat.hibernate.HibernateUtils;
 
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -21,8 +19,8 @@ public class ChatApplication {
         UsersDao usersDao = new HibernateUsersDao();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        System.out.println("Для работы с channel введите - Channel");
-        System.out.println("Для работы с users введите - Users");
+        System.out.println("[log] Для работы с channel введите - Channel");
+        System.out.println("[log] Для работы с users введите - Users");
         String _case = reader.readLine().toLowerCase();
         switch (_case){
             case "channel": {
@@ -63,34 +61,45 @@ public class ChatApplication {
                 break;
             }
             case "users":{
-                System.out.println("Найти всех клиентов - enter [findAllUsers]");
-                System.out.println("Найти пользователя по логину - enter [findByLogin]");
-                System.out.println("Найти пользователя по id - enter [findById]");
-                System.out.println("Удалить клиента - enter [removeById]");
-                System.out.println("Создать клиента - enter [createUser]");
-                String _caseUsers = reader.readLine();
+                System.out.println("[log] Найти всех клиентов - enter [findAllUsers]");
+                System.out.println("[log] Найти пользователя по логину - enter [findByLogin]");
+                System.out.println("[log] Найти пользователя по id - enter [findById]");
+                System.out.println("[log] Удалить клиента - enter [removeById]");
+                System.out.println("[log] Создать клиента - enter [createUser]");
+                String _caseUsers = reader.readLine().toLowerCase();
                 switch (_caseUsers){
                     case "findallusers":{
                         usersDao.findAllUsers();
                         break;
                     }
                     case "findbylogin":{
-                        System.out.println("Введите логин пользователя - ");
+                        System.out.println("[log] Введите логин пользователя - ");
                         String loginU = reader.readLine();
                         Users fUser = usersDao.findByLogin(loginU);
                         break;
                     }
-                    case "findbyid":{}
-                    case "removebyid":{}
-                    case "createuser":{}
+                    case "findbyid":{
+                        System.out.println(String.format("[log] Введите id пользователя(int)"));
+                        String idFind = reader.readLine();
+                        usersDao.findById(Integer.parseInt(idFind));
+                        break;
+                    }
+                    case "removebyid":{
+                        usersDao.removeById();
+                        break;
+                    }
+                    case "createuser":{
+                        usersDao.createUsers();
+                        break;
+                    }
                     default: {
-                        System.out.println("Вы ввели некорректную команду.");
+                        System.out.println("[log] Вы ввели некорректную команду.");
                     }
                 }
                 break;
             }
             default: {
-                System.out.println("Вы ввели некорректную команду.");
+                System.out.println("[log] Вы ввели некорректную команду.");
             }
         }
         HibernateUtils.getFactory().close();

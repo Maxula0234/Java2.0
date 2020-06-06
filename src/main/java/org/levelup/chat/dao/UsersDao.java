@@ -9,7 +9,9 @@ public interface UsersDao {
 
     Collection<Users> findAllUsers();
     Users findByLogin(String login) throws IOException;
-    void removeById(int id);
-    Users createUsers(String firstName,String lastName);
-    Users findById(int id);
+    void removeById(int id) throws IOException;
+    void removeById()throws IOException;
+    Users createUsers() throws IOException;
+    Users findById(int id) throws IOException;
+    Users checkLogin(String login);
 }

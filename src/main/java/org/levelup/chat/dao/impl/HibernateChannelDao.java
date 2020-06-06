@@ -55,9 +55,9 @@ HibernateChannelDao implements ChannelDao {
                     channel.get().getName(), channel.get().getDisplayName()));
         } else {
             System.out.println(String.format("Канал с именем [%s] уже существует.", name));
-            System.out.println("Введите новое имя канала - ");
+            System.out.println("[log] Введите новое имя канала - ");
             String nameChannel2 = reader.readLine();
-            System.out.println("Введите новое displayName канала - ");
+            System.out.println("[log] Введите новое displayName канала - ");
             String displayName2 = reader.readLine().toLowerCase();
             createChannel(nameChannel2,displayName2);
         }
@@ -86,7 +86,7 @@ HibernateChannelDao implements ChannelDao {
                     .setParameter("channelName", name)
                     .getResultList();
             if (channels.isEmpty()){
-                System.out.println(String.format("Channel с name = [%s] не найден.",name));
+                System.out.println(String.format("[log] Channel с name = [%s] не найден.",name));
             }
             return channels.isEmpty() ? null : channels.get(0);
         }
