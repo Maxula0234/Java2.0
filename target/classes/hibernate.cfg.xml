@@ -16,5 +16,7 @@
         <property name="hibernate.format_sql">true</property>
 
         <mapping class="org.levelup.chat.domain.Channel"/>
+        <mapping class="org.levelup.chat.domain.Users"/>
+
     </session-factory>
 </hibernate-configuration>

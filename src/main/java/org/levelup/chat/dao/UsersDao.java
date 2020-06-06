@@ -6,6 +6,8 @@ import java.util.Collection;
 
 public interface UsersDao {
 
-    public Collection<Users> findAllUsers();
-    public Users findByLogin(String login);
+    Collection<Users> findAllUsers();
+    Users findByLogin(String login);
+    void removeById(int id);
+    public Users createUsers(String firstName,String lastName);
 }

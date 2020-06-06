@@ -2,10 +2,18 @@ package org.levelup.chat.dao.impl;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.levelup.chat.dao.UsersDao;
+import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.Users;
 import org.levelup.chat.hibernate.HibernateUtils;
+import org.levelup.chat.jdbc.DatabaseConnectionFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,7 +26,7 @@ public class HibernateUsersDao implements UsersDao {
     @Override
     public Collection<Users> findAllUsers() {
         Session session = factory.openSession();
-        Collection<Users> allUsers = session.createQuery("from Users",Users.class).getResultList();
+        Collection<Users> allUsers = session.createQuery("from Users", Users.class).getResultList();
         session.close();
         return allUsers;
     }
@@ -26,13 +34,35 @@ public class HibernateUsersDao implements UsersDao {
     @Override
     public Users findByLogin(String login) {
         try (Session session = factory.openSession()){
-            List<Users> users = session.createQuery("from Users where login = :login",Users.class)
+            List<Users> users = session.createQuery("from Users where login = :login", Users.class)
                     .setParameter("login",login)
                     .getResultList();
             return users.isEmpty() ? null : users.get(0);
         }
-
     }
 
+    @Override
+    public void removeById(int id) {
+        try(Session session = factory.openSession()){
+            session.createQuery("DELETE Users where id = :idUsers", Users.class)
+                    .setParameter(1,String.valueOf(id))
+                    .executeUpdate();
+        }
+    }
 
+    @Override
+    public Users createUsers(String firstName, String lastName) {
+        try (Session session = factory.openSession()){
+            Transaction transaction = session.beginTransaction();
+            Users user = new Users();
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            String login = firstName.charAt(0) + lastName;
+            user.setLogin(login.toLowerCase());
+            session.persist(user); // insert into channel, add new row into table "channel"
+            transaction.commit();
+            session.close(); // close connection to database
+            return user;
+        }
+    }
 }
