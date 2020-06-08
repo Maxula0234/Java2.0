@@ -12,6 +12,15 @@ public class TestChat {
 
     @ParameterizedTest
     @CsvSource({"1","2","3"})
+    @Order(2)
+    public void test2(String s){
+        System.out.println(String.format("%s",s));
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({"енот","бегимот","слон"})
+    @Order(1)
     public void test1(String s){
         System.out.println(String.format("%s",s));
     }
