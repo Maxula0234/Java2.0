@@ -33,14 +33,16 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Users findByLogin(String login) throws IOException {
+    public Users findByLogin() throws IOException {
         try (Session session = factory.openSession()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             AtomicReference<Users> user = new AtomicReference<>();
+            System.out.println("Введите логин");
+            String login = reader.readLine();
             List<Users> users = session.createQuery("from Users where login = :login", Users.class)
                     .setParameter("login", login)
                     .getResultList();
-            if (users.size() == 0) {
+            if (users == null) {
                 System.out.println(String.format("[log] Клиент с login = [%s] не найден", login));
                 System.out.println("[log] Хотите попробовать найти другой логин? - y/n");
                 String yn = reader.readLine().toLowerCase();
@@ -48,7 +50,7 @@ public class HibernateUsersDao implements UsersDao {
                     case "y": {
                         System.out.println("[log] Введите новый логин - ");
                         String newLogin = reader.readLine();
-                        findByLogin(newLogin);
+                        findByLogin();
                     }
                     case "n": {
                         System.out.println("[log] Программа завершена....");
@@ -90,6 +92,40 @@ public class HibernateUsersDao implements UsersDao {
                 }
             } else {
                 user.set(users.get(0));
+                System.out.println(String.format("Клиент найден - [id = %s],[firstName = %s],[lastName = %s],[login = %s].",
+                        user.get().getId(), user.get().getFirstName(), user.get().getLastName(), user.get().getLogin()));
+                return user.get();
+            }
+            return user.get();
+        }
+    }
+
+    @Override
+    public Users findByIdNew() throws IOException {
+        try (Session session = factory.openSession()) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter id");
+            Integer id = Integer.parseInt(reader.readLine());
+            AtomicReference<Users> user = new AtomicReference<>();
+            Users user1 = session.get(Users.class,id);
+            if (user1==null) {
+                System.out.println(String.format("Клиент с id = [%s] не найден", id));
+                System.out.println("[log] Хотите попробовать найти другой id? - y/n");
+                String yn = reader.readLine().toLowerCase();
+                switch (yn) {
+                    case "y": {
+                        System.out.println("[log] Введите новый id(int) - ");
+                        String newLogin = reader.readLine();
+                        user.set(findById(Integer.parseInt(newLogin)));
+                        break;
+                    }
+                    case "n": {
+                        System.out.println("[log] Программа завершена....");
+                        return null;
+                    }
+                }
+            } else {
+                user.set(user1);
                 System.out.println(String.format("Клиент найден - [id = %s],[firstName = %s],[lastName = %s],[login = %s].",
                         user.get().getId(), user.get().getFirstName(), user.get().getLastName(), user.get().getLogin()));
                 return user.get();

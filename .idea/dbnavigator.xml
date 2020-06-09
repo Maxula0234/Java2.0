@@ -25,7 +25,7 @@
     <show-object-properties value="true" />
     <loaded-nodes>
       <connection connection-id="333f7265-db57-40e0-8623-01a2dc25458f">
-        <schema name="public" object-types="table, view" />
+        <schema name="public" object-types="function, column, constraint, table, sequence, index, dataset trigger, view" />
       </connection>
     </loaded-nodes>
   </component>
@@ -37,7 +37,7 @@
     c.&quot;name&quot;
 from
     channel c;</console>
-      <console name="User" type="STANDARD" schema="information_schema" session="Main">select * from &quot;public&quot;.users</console>
+      <console name="User" type="STANDARD" schema="information_schema" session="Main"><![CDATA[select * from "public".message]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
