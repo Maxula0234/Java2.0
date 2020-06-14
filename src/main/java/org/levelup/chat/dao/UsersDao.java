@@ -15,5 +15,8 @@ public interface UsersDao {
     Users findById(int id) throws IOException;
     Users checkLogin(String login);
     Users findByIdNew() throws IOException;
-
+    Users updateUser(Integer id, String firstName,String lastName,String login) throws IOException;
+    Users updateFirstNamUser(Integer id, String firstName) throws IOException;
+    Users updateLastNameUser(Integer id, String lastName) throws IOException;
+    Users updateLoginUser(Integer id, String login) throws IOException;
 }

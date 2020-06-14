@@ -70,7 +70,7 @@ public class ChatApplication {
 //                System.out.println("[log] Найти пользователя по id - enter [findById]");
 //                System.out.println("[log] Удалить клиента - enter [removeById]");
 //                System.out.println("[log] Создать клиента - enter [createUser]");
-//                System.out.println("[log] Создать клиента - enter [findByIdNew]");
+//                System.out.println("[log] Найти клиента(новая) - enter [findByIdNew]");
 //                String _caseUsers = reader.readLine().toLowerCase();
 //                switch (_caseUsers){
 //                    case "findallusers":{
@@ -115,7 +115,17 @@ public class ChatApplication {
     @SneakyThrows
     public static void main(String[] args) {
         MessageDao messageDao = new HibernateMessageDao();
+        UsersDao usersDao = new HibernateUsersDao();
+        ChannelDao channelDao = new HibernateChannelDao();
 //        messageDao.getMessageById(1);
-        messageDao.updateMessageById(1,"Hi all");
+//     ?   messageDao.updateMessageById(1,"Hi all");
+//        usersDao.updateFirstNamUser(1,"Maksim");
+//        usersDao.updateLastNameUser(1,"khorovinkin2");
+//        usersDao.updateLoginUser(1,"mkhorovinkin");
+//        channelDao.findById(1);
+
+//        channelDao.updateChannel(1,"levelU2p","LevelIp. Java2.");
+
+        usersDao.updateUser(1,"mkhorovinkin","ekat","khorovinkin");
     }
 }

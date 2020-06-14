@@ -12,5 +12,7 @@ public interface ChannelDao {
     Collection<Channel> findAll();
     void removeByName(String name);
     Channel findByName(String name);
+    Channel findById(Integer id);
+    Channel updateChannel(Integer id,String name,String displayName);
 
 }

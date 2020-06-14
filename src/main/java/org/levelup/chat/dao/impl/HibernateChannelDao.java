@@ -1,5 +1,6 @@
 package org.levelup.chat.dao.impl;
 
+import com.sun.xml.txw2.output.DumpSerializer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -11,6 +12,7 @@ import org.levelup.chat.hibernate.HibernateUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.invoke.StringConcatFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,8 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 //      -> findByName (getByName)
 //      -> findByField (getByField)
 
-public class
-HibernateChannelDao implements ChannelDao {
+public class HibernateChannelDao implements ChannelDao {
 
     private final SessionFactory factory;
 
@@ -77,7 +78,6 @@ HibernateChannelDao implements ChannelDao {
                 channel.getName(),channel.getDisplayName())));
         return allChannels;
     }
-
     @Override
     public Channel findByName(String name) {
         try (Session session = factory.openSession()) {
@@ -91,6 +91,7 @@ HibernateChannelDao implements ChannelDao {
             return channels.isEmpty() ? null : channels.get(0);
         }
     }
+
     @Override
     public void removeByName(String name) {
         try (Session session = factory.openSession()) {
@@ -109,4 +110,44 @@ HibernateChannelDao implements ChannelDao {
         }
     }
 
+    @Override
+    public Channel findById(Integer id) {
+        Channel channel;
+        try (Session session = factory.openSession()){
+            channel = session.get(Channel.class,id);
+            System.out.println(String.format("Найден канал - [id = %s],[name = %s],[displayName = %s]", channel.getId(),channel.getName(),channel.getDisplayName()));
+        }
+        return channel;
+    }
+
+    @Override
+    public Channel updateChannel(Integer id, String name, String displayName) {
+        Channel channel;
+        try(Session session = factory.openSession()){
+            channel = session.get(Channel.class,id);
+
+            String nameOld = channel.getName();
+            String displayNameOld = channel.getDisplayName();
+
+            Transaction t = session.beginTransaction();
+            if (nameOld != name) {
+                channel.setName(name);
+            } else {
+                channel.setName(nameOld);
+            }
+            if (displayNameOld != displayName) {
+                channel.setDisplayName(displayName);
+            } else {
+                channel.setDisplayName(displayNameOld);
+            }
+
+            channel = (Channel) session.merge(channel);
+            System.out.println(String.format("Обновили канал [id = %s],[name = %s],[displayName = %s]",
+                    channel.getId(),channel.getName(),channel.getDisplayName()));
+            System.out.println(String.format("Старые данные [id = %s],[name = %s],[displayName = %s]",
+                    id,nameOld,displayNameOld));
+            t.commit();
+        }
+        return channel;
+    }
 }

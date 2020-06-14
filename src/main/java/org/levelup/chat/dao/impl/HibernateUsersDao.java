@@ -107,8 +107,8 @@ public class HibernateUsersDao implements UsersDao {
             System.out.println("Enter id");
             Integer id = Integer.parseInt(reader.readLine());
             AtomicReference<Users> user = new AtomicReference<>();
-            Users user1 = session.get(Users.class,id);
-            if (user1==null) {
+            Users user1 = session.get(Users.class, id);
+            if (user1 == null) {
                 System.out.println(String.format("Клиент с id = [%s] не найден", id));
                 System.out.println("[log] Хотите попробовать найти другой id? - y/n");
                 String yn = reader.readLine().toLowerCase();
@@ -238,8 +238,8 @@ public class HibernateUsersDao implements UsersDao {
             String firstName = reader.readLine();
             System.out.println("Введите фамилию.");
             String lastName = reader.readLine();
-
-            String login = firstName.charAt(0) + lastName;
+            System.out.println("Введите login.");
+            String login = reader.readLine();
             Users checkLogin = checkLogin(login.toLowerCase());
             if (checkLogin == null) {
                 Transaction transaction = session.beginTransaction();
@@ -270,4 +270,87 @@ public class HibernateUsersDao implements UsersDao {
             return newUser.get();
         }
     }
+
+    @Override
+    public Users updateUser(Integer id, String firstName, String lastName, String login) throws IOException {
+        Users users;
+        try (Session session = factory.openSession()) {
+            users = session.get(Users.class, id);
+
+            String firstNameOld = users.getFirstName();
+            String lastNameOld = users.getLastName();
+            String loginOld = users.getLogin();
+
+            if (firstNameOld != firstName) {
+                users.setFirstName(firstName);
+            }
+            if (lastNameOld != lastName) {
+                users.setLastName(lastName);
+            }
+            if (loginOld != login) {
+                users.setLogin(login);
+            }
+
+            Transaction t = session.beginTransaction();
+            Users updateUser = (Users) session.merge(users);
+
+            System.out.println(String.format("Обновили данные для клиента - [id = %s],[firstName = %s],[lastName = %s],[login = %s]",
+                    users.getId(), users.getFirstName(), users.getLastName(), users.getLogin()));
+            System.out.println(String.format("Старые данные клиента - [id = %s],[firstName = %s],[lastName = %s],[login = %s]",
+                    users.getId(), firstNameOld, lastNameOld, loginOld));
+            t.commit();
+        }
+        return users;
+    }
+
+    @Override
+    public Users updateFirstNamUser(Integer id, String firstName) throws IOException {
+        Users users;
+        try (Session session = factory.openSession()) {
+            users = session.get(Users.class, id);
+            String oldFirstName = users.getFirstName();
+            users.setFirstName(firstName);
+
+            Transaction t = session.beginTransaction();
+            users = (Users) session.merge(users);
+            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", users.getId(), users.getFirstName(), oldFirstName));
+            t.commit();
+        }
+        return users;
+    }
+
+    @Override
+    public Users updateLastNameUser(Integer id, String lastName) throws IOException {
+        Users users;
+        try (Session session = factory.openSession()) {
+            users = session.get(Users.class, id);
+            String oldLastName = users.getLastName();
+
+            Transaction t = session.beginTransaction();
+            users.setLastName(lastName);
+            Object merge = session.merge(users);
+            users = (Users) merge;
+
+            t.commit();
+            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", users.getId(), users.getLastName(), oldLastName));
+        }
+        return users;
+    }
+
+    @Override
+    public Users updateLoginUser(Integer id, String login) throws IOException {
+        Users users;
+        try (Session session = factory.openSession()) {
+            users = session.get(Users.class, id);
+            String oldLogin = users.getLogin();
+
+            Transaction t = session.beginTransaction();
+            users.setLogin(login);
+            Users updateUser = (Users) session.merge(users);
+            t.commit();
+            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", users.getId(), users.getLogin(), oldLogin));
+        }
+        return users;
+    }
+
 }
