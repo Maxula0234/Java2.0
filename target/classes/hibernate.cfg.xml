@@ -16,8 +16,9 @@
         <property name="hibernate.format_sql">true</property>
 
         <mapping class="org.levelup.chat.domain.Channel"/>
-        <mapping class="org.levelup.chat.domain.Users"/>
+        <mapping class="org.levelup.chat.domain.User"/>
         <mapping class="org.levelup.chat.domain.Message"/>
+        <mapping class="org.levelup.chat.domain.ChannelDetails"/>
 
     </session-factory>
 </hibernate-configuration>

@@ -1,18 +1,16 @@
 package org.levelup.chat.dao.impl;
 
-import com.sun.xml.txw2.output.DumpSerializer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.levelup.chat.dao.ChannelDao;
 import org.levelup.chat.domain.Channel;
-import org.levelup.chat.domain.Users;
+import org.levelup.chat.domain.User;
 import org.levelup.chat.hibernate.HibernateUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.invoke.StringConcatFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,7 +43,7 @@ public class HibernateChannelDao implements ChannelDao {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         // Insert, update, delete
         Channel checkName = findByName(name);
-        if (checkName == null){
+        if (checkName == null) {
             Transaction transaction = session.beginTransaction();
             channel.get().setName(name);
             channel.get().setDisplayName(displayName);
@@ -60,7 +58,7 @@ public class HibernateChannelDao implements ChannelDao {
             String nameChannel2 = reader.readLine();
             System.out.println("[log] Введите новое displayName канала - ");
             String displayName2 = reader.readLine().toLowerCase();
-            createChannel(nameChannel2,displayName2);
+            createChannel(nameChannel2, displayName2);
         }
         return channel.get();
     }
@@ -75,9 +73,10 @@ public class HibernateChannelDao implements ChannelDao {
                 .getResultList();
         session.close();
         allChannels.stream().forEach(channel -> System.out.println(String.format("[log] [name = %s],[displayName = %s]",
-                channel.getName(),channel.getDisplayName())));
+                channel.getName(), channel.getDisplayName())));
         return allChannels;
     }
+
     @Override
     public Channel findByName(String name) {
         try (Session session = factory.openSession()) {
@@ -85,8 +84,8 @@ public class HibernateChannelDao implements ChannelDao {
             List<Channel> channels = session.createQuery("from Channel where name = :channelName", Channel.class)
                     .setParameter("channelName", name)
                     .getResultList();
-            if (channels.isEmpty()){
-                System.out.println(String.format("[log] Channel с name = [%s] не найден.",name));
+            if (channels.isEmpty()) {
+                System.out.println(String.format("[log] Channel с name = [%s] не найден.", name));
             }
             return channels.isEmpty() ? null : channels.get(0);
         }
@@ -103,8 +102,8 @@ public class HibernateChannelDao implements ChannelDao {
                         .executeUpdate();
                 transaction.commit();
                 System.out.println(String.format("[log] Удалили канал: " +
-                        "name = [%s], " +
-                        "DisplayName = [%s], "
+                                "name = [%s], " +
+                                "DisplayName = [%s], "
                         , channel.getName(), channel.getDisplayName()));
             }
         }
@@ -113,9 +112,9 @@ public class HibernateChannelDao implements ChannelDao {
     @Override
     public Channel findById(Integer id) {
         Channel channel;
-        try (Session session = factory.openSession()){
-            channel = session.get(Channel.class,id);
-            System.out.println(String.format("Найден канал - [id = %s],[name = %s],[displayName = %s]", channel.getId(),channel.getName(),channel.getDisplayName()));
+        try (Session session = factory.openSession()) {
+            channel = session.get(Channel.class, id);
+            System.out.println(String.format("Найден канал - [id = %s],[name = %s],[displayName = %s]", channel.getId(), channel.getName(), channel.getDisplayName()));
         }
         return channel;
     }
@@ -123,31 +122,43 @@ public class HibernateChannelDao implements ChannelDao {
     @Override
     public Channel updateChannel(Integer id, String name, String displayName) {
         Channel channel;
-        try(Session session = factory.openSession()){
-            channel = session.get(Channel.class,id);
+        try (Session session = factory.openSession()) {
+            channel = session.get(Channel.class, id);
 
             String nameOld = channel.getName();
             String displayNameOld = channel.getDisplayName();
 
             Transaction t = session.beginTransaction();
-            if (nameOld != name) {
-                channel.setName(name);
-            } else {
-                channel.setName(nameOld);
-            }
-            if (displayNameOld != displayName) {
-                channel.setDisplayName(displayName);
-            } else {
-                channel.setDisplayName(displayNameOld);
-            }
+            channel.setName(name);
+            channel.setDisplayName(displayName);
 
             channel = (Channel) session.merge(channel);
             System.out.println(String.format("Обновили канал [id = %s],[name = %s],[displayName = %s]",
-                    channel.getId(),channel.getName(),channel.getDisplayName()));
+                    channel.getId(), channel.getName(), channel.getDisplayName()));
             System.out.println(String.format("Старые данные [id = %s],[name = %s],[displayName = %s]",
-                    id,nameOld,displayNameOld));
+                    id, nameOld, displayNameOld));
             t.commit();
         }
         return channel;
     }
+
+    @Override
+    public void addUserToChannel(Integer channelId, Integer userId) {
+        try (Session session = factory.openSession()) {
+            //ACID
+            //Атомарность
+            //Консистентность (Согласованность) - валидация - в бд должно остаться те ограничения, которые установленный в бд и таблице
+            // Изоляция ()
+            // Стойкость (Durability)
+            Transaction transaction = session.beginTransaction();
+            Channel channel = session.get(Channel.class, channelId);
+            User user = new User();
+            user.setId(userId);
+            channel.getUsers().add(user);
+            session.merge(channel);
+            transaction.commit();
+        }
+    }
+
+
 }

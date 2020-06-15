@@ -1,4 +1,4 @@
-package org.levelup.lessons;
+package org.levelup.lessons.lesson4;
 
 import java.lang.reflect.Field;
 import java.net.URL;

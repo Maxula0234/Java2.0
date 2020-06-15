@@ -1,14 +1,14 @@
 package org.levelup.lessons.lesson7;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.swing.text.html.Option;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class StreamsApp {
     public static void main(String[] args) {
+
 
         //StreamApi + lambda
         Collection<String> logins = new ArrayList<>();

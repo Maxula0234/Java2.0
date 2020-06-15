@@ -1,23 +1,24 @@
 package org.levelup.chat.dao.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.levelup.chat.dao.MessageDao;
+import org.hibernate.Transaction;
+import org.levelup.chat.dao.MessagesDao;
+import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.Message;
-import org.levelup.chat.hibernate.HibernateUtils;
+import org.levelup.chat.domain.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class HibernateMessageDao implements MessageDao {
+@RequiredArgsConstructor
+public class HibernateMessagesDao implements MessagesDao {
     private final SessionFactory factory;
-
-    public HibernateMessageDao() {
-        this.factory = HibernateUtils.getFactory();
-    }
 
     @Override
     public Message getMessageById() throws IOException {
@@ -28,7 +29,7 @@ public class HibernateMessageDao implements MessageDao {
             Integer id = Integer.parseInt(reader.readLine());
             message = session.get(Message.class, id);
             System.out.println(String.format("Найдено сообщение: [text - %s][date - %s][userId - %s][channelId - %s]",
-                    message.getText(),message.getDate(),message.getUserId(),message.getChannelId()));
+                    message.getText(), message.getDate(), message.getUser(), message.getChannel()));
         }
         return message;
     }
@@ -40,7 +41,7 @@ public class HibernateMessageDao implements MessageDao {
             try {
                 message = session.get(Message.class,id);
                 System.out.println(String.format("Найдено сообщение: [text - %s][date - %s][userId - %s][channelId - %s]",
-                        message.getText(),message.getDate(),message.getUserId(),message.getChannelId()));
+                        message.getText(), message.getDate(), message.getUser(), message.getChannel()));
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println(String.format("Сообщение с id = %s, не найден.",id));
@@ -62,6 +63,21 @@ public class HibernateMessageDao implements MessageDao {
             System.out.println(String.format("Update text for messageId = %s, [old text = %s], [new text = %s]",id,oldText,text));
         }
         return message;
+    }
+
+    @Override
+    public void sendMessage(User user, Channel channel, String text) {
+        try(Session session = factory.openSession()){
+            Transaction transaction = session.beginTransaction();
+            Message message = new Message();
+            message.setUser(user);
+            message.setChannel(channel);
+            message.setText(text);
+            message.setDate(LocalDateTime.now());
+            session.persist(message);
+
+            transaction.commit();
+        }
     }
 
 }

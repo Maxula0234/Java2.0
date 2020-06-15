@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
-public class Users {
+public class User {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "id")
@@ -24,7 +24,7 @@ public class Users {
         @Column(name = "last_name")
         private String lastName;
 
-        public Users(String login,String firstName,String lastName){
+        public User(String login, String firstName, String lastName){
                 this.login = login;
                 this.firstName = firstName;
                 this.lastName = lastName;

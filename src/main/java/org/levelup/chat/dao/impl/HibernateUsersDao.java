@@ -4,7 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.levelup.chat.dao.UsersDao;
-import org.levelup.chat.domain.Users;
+import org.levelup.chat.domain.User;
 import org.levelup.chat.hibernate.HibernateUtils;
 
 import java.io.BufferedReader;
@@ -22,9 +22,9 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Collection<Users> findAllUsers() {
+    public Collection<User> findAllUsers() {
         Session session = factory.openSession();
-        Collection<Users> allUsers = session.createQuery("from Users", Users.class).getResultList();
+        Collection<User> allUsers = session.createQuery("from Users", User.class).getResultList();
         session.close();
         allUsers.stream()
                 .forEach(s -> System.out.println(String.format("[log] [id = %s][firstName - %s], [lastName - %s], [login - %s]",
@@ -33,13 +33,13 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Users findByLogin() throws IOException {
+    public User findByLogin() throws IOException {
         try (Session session = factory.openSession()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            AtomicReference<Users> user = new AtomicReference<>();
+            AtomicReference<User> user = new AtomicReference<>();
             System.out.println("Введите логин");
             String login = reader.readLine();
-            List<Users> users = session.createQuery("from Users where login = :login", Users.class)
+            List<User> users = session.createQuery("from Users where login = :login", User.class)
                     .setParameter("login", login)
                     .getResultList();
             if (users == null) {
@@ -67,11 +67,11 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Users findById(int id) throws IOException {
+    public User findById(int id) throws IOException {
         try (Session session = factory.openSession()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            AtomicReference<Users> user = new AtomicReference<>();
-            List<Users> users = session.createQuery("from Users where id = :id", Users.class)
+            AtomicReference<User> user = new AtomicReference<>();
+            List<User> users = session.createQuery("from Users where id = :id", User.class)
                     .setParameter("id", id)
                     .getResultList();
             if (users.isEmpty()) {
@@ -101,13 +101,13 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Users findByIdNew() throws IOException {
+    public User findByIdNew() throws IOException {
         try (Session session = factory.openSession()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Enter id");
             Integer id = Integer.parseInt(reader.readLine());
-            AtomicReference<Users> user = new AtomicReference<>();
-            Users user1 = session.get(Users.class, id);
+            AtomicReference<User> user = new AtomicReference<>();
+            User user1 = session.get(User.class, id);
             if (user1 == null) {
                 System.out.println(String.format("Клиент с id = [%s] не найден", id));
                 System.out.println("[log] Хотите попробовать найти другой id? - y/n");
@@ -135,9 +135,9 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Users checkLogin(String login) {
+    public User checkLogin(String login) {
         try (Session session = factory.openSession()) {
-            List<Users> users = session.createQuery("from Users where login = :login", Users.class)
+            List<User> users = session.createQuery("from Users where login = :login", User.class)
                     .setParameter("login", login)
                     .getResultList();
             if (users.size() == 0) {
@@ -154,10 +154,10 @@ public class HibernateUsersDao implements UsersDao {
     public void removeById() throws IOException {
         try (Session session = factory.openSession()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            Collection<Users> allUsers = findAllUsers();
+            Collection<User> allUsers = findAllUsers();
             System.out.println("[log] Введите id пользователя, которого необходимо удалить.");
             String delId = reader.readLine();
-            Users user = findById(Integer.parseInt(delId));
+            User user = findById(Integer.parseInt(delId));
             if (user != null) {
                 System.out.println(String.format("[log] Клиент найден: " +
                         "firstName = [%s], " +
@@ -193,10 +193,10 @@ public class HibernateUsersDao implements UsersDao {
     public void removeById(int id) throws IOException {
         try (Session session = factory.openSession()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            Collection<Users> allUsers = findAllUsers();
+            Collection<User> allUsers = findAllUsers();
             System.out.println("[log] Введите id пользователя, которого необходимо удалить.");
             String delId = reader.readLine();
-            Users user = findById(Integer.parseInt(delId));
+            User user = findById(Integer.parseInt(delId));
             if (user != null) {
                 System.out.println(String.format("[log] Клиент найден: " +
                         "firstName = [%s], " +
@@ -229,10 +229,10 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Users createUsers() throws IOException {
+    public User createUsers() throws IOException {
         try (Session session = factory.openSession()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            AtomicReference<Users> newUser = new AtomicReference<>();
+            AtomicReference<User> newUser = new AtomicReference<>();
 
             System.out.println("Введите имя.");
             String firstName = reader.readLine();
@@ -240,10 +240,10 @@ public class HibernateUsersDao implements UsersDao {
             String lastName = reader.readLine();
             System.out.println("Введите login.");
             String login = reader.readLine();
-            Users checkLogin = checkLogin(login.toLowerCase());
+            User checkLogin = checkLogin(login.toLowerCase());
             if (checkLogin == null) {
                 Transaction transaction = session.beginTransaction();
-                Users user = new Users();
+                User user = new User();
                 user.setLastName(lastName);
                 user.setFirstName(firstName);
                 user.setLogin(login.toLowerCase());
@@ -272,85 +272,85 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Users updateUser(Integer id, String firstName, String lastName, String login) throws IOException {
-        Users users;
+    public User updateUser(Integer id, String firstName, String lastName, String login) throws IOException {
+        User user;
         try (Session session = factory.openSession()) {
-            users = session.get(Users.class, id);
+            user = session.get(User.class, id);
 
-            String firstNameOld = users.getFirstName();
-            String lastNameOld = users.getLastName();
-            String loginOld = users.getLogin();
+            String firstNameOld = user.getFirstName();
+            String lastNameOld = user.getLastName();
+            String loginOld = user.getLogin();
 
             if (firstNameOld != firstName) {
-                users.setFirstName(firstName);
+                user.setFirstName(firstName);
             }
             if (lastNameOld != lastName) {
-                users.setLastName(lastName);
+                user.setLastName(lastName);
             }
             if (loginOld != login) {
-                users.setLogin(login);
+                user.setLogin(login);
             }
 
             Transaction t = session.beginTransaction();
-            Users updateUser = (Users) session.merge(users);
+            User updateUser = (User) session.merge(user);
 
             System.out.println(String.format("Обновили данные для клиента - [id = %s],[firstName = %s],[lastName = %s],[login = %s]",
-                    users.getId(), users.getFirstName(), users.getLastName(), users.getLogin()));
+                    user.getId(), user.getFirstName(), user.getLastName(), user.getLogin()));
             System.out.println(String.format("Старые данные клиента - [id = %s],[firstName = %s],[lastName = %s],[login = %s]",
-                    users.getId(), firstNameOld, lastNameOld, loginOld));
+                    user.getId(), firstNameOld, lastNameOld, loginOld));
             t.commit();
         }
-        return users;
+        return user;
     }
 
     @Override
-    public Users updateFirstNamUser(Integer id, String firstName) throws IOException {
-        Users users;
+    public User updateFirstNamUser(Integer id, String firstName) throws IOException {
+        User user;
         try (Session session = factory.openSession()) {
-            users = session.get(Users.class, id);
-            String oldFirstName = users.getFirstName();
-            users.setFirstName(firstName);
+            user = session.get(User.class, id);
+            String oldFirstName = user.getFirstName();
+            user.setFirstName(firstName);
 
             Transaction t = session.beginTransaction();
-            users = (Users) session.merge(users);
-            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", users.getId(), users.getFirstName(), oldFirstName));
+            user = (User) session.merge(user);
+            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", user.getId(), user.getFirstName(), oldFirstName));
             t.commit();
         }
-        return users;
+        return user;
     }
 
     @Override
-    public Users updateLastNameUser(Integer id, String lastName) throws IOException {
-        Users users;
+    public User updateLastNameUser(Integer id, String lastName) throws IOException {
+        User user;
         try (Session session = factory.openSession()) {
-            users = session.get(Users.class, id);
-            String oldLastName = users.getLastName();
+            user = session.get(User.class, id);
+            String oldLastName = user.getLastName();
 
             Transaction t = session.beginTransaction();
-            users.setLastName(lastName);
-            Object merge = session.merge(users);
-            users = (Users) merge;
+            user.setLastName(lastName);
+            Object merge = session.merge(user);
+            user = (User) merge;
 
             t.commit();
-            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", users.getId(), users.getLastName(), oldLastName));
+            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", user.getId(), user.getLastName(), oldLastName));
         }
-        return users;
+        return user;
     }
 
     @Override
-    public Users updateLoginUser(Integer id, String login) throws IOException {
-        Users users;
+    public User updateLoginUser(Integer id, String login) throws IOException {
+        User user;
         try (Session session = factory.openSession()) {
-            users = session.get(Users.class, id);
-            String oldLogin = users.getLogin();
+            user = session.get(User.class, id);
+            String oldLogin = user.getLogin();
 
             Transaction t = session.beginTransaction();
-            users.setLogin(login);
-            Users updateUser = (Users) session.merge(users);
+            user.setLogin(login);
+            User updateUser = (User) session.merge(user);
             t.commit();
-            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", users.getId(), users.getLogin(), oldLogin));
+            System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", user.getId(), user.getLogin(), oldLogin));
         }
-        return users;
+        return user;
     }
 
 }

@@ -4,24 +4,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "message")
+@Table(name = "messages")
 public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "text")
     private String text;
-    @Column(name = "date")
-    private Timestamp date;
-    @Column(name = "user_id")
-    private Integer userId;
-    @Column(name = "channel_id")
-    private Integer channelId;
+    private LocalDateTime date;
+
+    //OneToMany -  используется с той стороны, где одно значение
+    //ManyToOne -  используется с той стороны, где прописан foreginKey
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
 }

@@ -2,17 +2,18 @@ package org.levelup.chat;
 
 import lombok.SneakyThrows;
 import org.levelup.chat.dao.ChannelDao;
-import org.levelup.chat.dao.MessageDao;
+import org.levelup.chat.dao.ChannelDetailsDao;
+import org.levelup.chat.dao.MessagesDao;
 import org.levelup.chat.dao.UsersDao;
 import org.levelup.chat.dao.impl.HibernateChannelDao;
-import org.levelup.chat.dao.impl.HibernateMessageDao;
+import org.levelup.chat.dao.impl.HibernateChannelDetailsDao;
+import org.levelup.chat.dao.impl.HibernateMessagesDao;
 import org.levelup.chat.dao.impl.HibernateUsersDao;
-import org.levelup.chat.domain.Message;
-import org.levelup.chat.domain.Users;
+import org.levelup.chat.domain.Channel;
+import org.levelup.chat.domain.User;
 import org.levelup.chat.hibernate.HibernateUtils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ChatApplication {
@@ -114,18 +115,15 @@ public class ChatApplication {
 
     @SneakyThrows
     public static void main(String[] args) {
-        MessageDao messageDao = new HibernateMessageDao();
-        UsersDao usersDao = new HibernateUsersDao();
+        MessagesDao messagesDao = new HibernateMessagesDao(HibernateUtils.getFactory());
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         ChannelDao channelDao = new HibernateChannelDao();
-//        messageDao.getMessageById(1);
-//     ?   messageDao.updateMessageById(1,"Hi all");
-//        usersDao.updateFirstNamUser(1,"Maksim");
-//        usersDao.updateLastNameUser(1,"khorovinkin2");
-//        usersDao.updateLoginUser(1,"mkhorovinkin");
-//        channelDao.findById(1);
 
-//        channelDao.updateChannel(1,"levelU2p","LevelIp. Java2.");
+        System.out.println("Enter id channel :");
+        Integer channelId = Integer.parseInt(reader.readLine());
+        System.out.println("Enter ID user: ");
+        Integer userId = Integer.parseInt(reader.readLine());
 
-        usersDao.updateUser(1,"mkhorovinkin","ekat","khorovinkin");
+        channelDao.addUserToChannel(channelId,userId);
     }
 }

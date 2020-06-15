@@ -1,4 +1,4 @@
-package org.levelup.lessons;
+package org.levelup.lessons.lesson4;
 
 public class Home {
     private String room = "kitchen";

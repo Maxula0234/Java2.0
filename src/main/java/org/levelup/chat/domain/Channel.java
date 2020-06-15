@@ -1,16 +1,13 @@
 package org.levelup.chat.domain;
 //Entity - сущность
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
-@Getter
-@Setter
+@Data
 @ToString
 @NoArgsConstructor
 @Table(name = "channel")
@@ -29,4 +26,18 @@ public class Channel {
   @Column(name = "display_name",nullable = false, unique = false, length = 100) //display_name varchar(100) not null
   private String displayName;
 
+  @OneToOne(mappedBy = "channel")
+  private ChannelDetails details;
+
+
+  @OneToMany(mappedBy = "channel")
+  private Collection<Message> messages;
+
+  @ManyToMany
+  @JoinTable(
+          name = "user_channels",
+          joinColumns = @JoinColumn(name = "channel_id"), // колонка которая ссылается на эту табличку
+          inverseJoinColumns = @JoinColumn(name = "user_id")// колонка которая ссылается на вторую тб из связи  м - то -М
+  )
+  private Collection<User> users;
 }

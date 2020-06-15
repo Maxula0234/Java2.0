@@ -19,9 +19,9 @@ public class TestChat {
 
 
     @ParameterizedTest
-    @CsvSource({"енот","бегимот","слон"})
+    @CsvSource({"енот,2","бегимот,2","слон,2"})
     @Order(1)
-    public void test1(String s){
-        System.out.println(String.format("%s",s));
+    public void test1(String s,String e){
+        System.out.println(String.format("%s - %s",s,e));
     }
 }

@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.levelup.chat.domain.Users;
+import org.levelup.chat.domain.User;
 
 @RequiredArgsConstructor
 public class UserDao1 {
     private final SessionFactory factory;
 
-    public Users createUSer(String login, String firstName, String lastName){
-        Users user;
+    public User createUSer(String login, String firstName, String lastName){
+        User user;
         try (Session session = factory.openSession()){
             Transaction t = session.beginTransaction();
-            user = new Users(login,firstName,lastName); //-> Transient (Переходящий)
+            user = new User(login,firstName,lastName); //-> Transient (Переходящий)
 
             Integer id = (Integer) session.save(user);
             System.out.println("Genereate id: " + id);//            session.persist(user); // -> Persistent (Постоянный)
@@ -38,12 +38,12 @@ public class UserDao1 {
     }
 
 
-    public Users mergeUser(Integer id, String login,String firstName, String lastName){
-        Users user;
+    public User mergeUser(Integer id, String login, String firstName, String lastName){
+        User user;
 
         try (Session session = factory.openSession()) {
             //get() ->  createQuery("from User where id = :id).setParametr("id",id).uniqueResult()
-            user = session.get(Users.class,id);
+            user = session.get(User.class,id);
         } //user - detached state
         try (Session session = factory.openSession()){
             Transaction t = session.beginTransaction();
@@ -51,7 +51,7 @@ public class UserDao1 {
             user.setFirstName(firstName);
             user.setLastName(lastName);
 
-            Users mergeUser = (Users) session.merge(user);
+            User mergeUser = (User) session.merge(user);
             //user - detached
             //merfeUser - persistent
 
@@ -62,11 +62,11 @@ public class UserDao1 {
         return null;
     }
 
-    public Users updateUser(Integer id, String login,String firstName, String lastName){
-        Users user;
+    public User updateUser(Integer id, String login, String firstName, String lastName){
+        User user;
         try (Session session = factory.openSession()){
             Transaction t = session.beginTransaction();
-            user = session.get(Users.class,id);
+            user = session.get(User.class,id);
 
             session.evict(user);
             user.setLogin(login);
@@ -82,18 +82,18 @@ public class UserDao1 {
 
     //get and load получить сущность по id
     public void get(Integer id){
-        Users user;
+        User user;
         try (Session session = factory.openSession()){
-            user = session.get(Users.class,id);
+            user = session.get(User.class,id);
           //  System.out.println("Detached user : " + user.toString());
         }
         System.out.println("Detached user : " + user.toString());
     }
 
     public void load(Integer id){
-        Users user;
+        User user;
         try (Session session = factory.openSession()){
-            user = session.load(Users.class,id);
+            user = session.load(User.class,id);
             System.out.println(user.getLogin());
           //  System.out.println("Persistance user: " + user.toString());
         }
