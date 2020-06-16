@@ -4,6 +4,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.levelup.chat.dao.UsersDao;
+import org.levelup.chat.domain.Channel;
+import org.levelup.chat.domain.Password;
 import org.levelup.chat.domain.User;
 import org.levelup.chat.hibernate.HibernateUtils;
 
@@ -351,6 +353,49 @@ public class HibernateUsersDao implements UsersDao {
             System.out.println(String.format("Обновили имя клиенту с id = %s, новоем имя %s(старое - %s)", user.getId(), user.getLogin(), oldLogin));
         }
         return user;
+    }
+
+    @Override
+    public Password addUserToChat(Integer userId, String password) {
+        try (Session session = factory.openSession()){
+            Password checkUser = findUserIdFromPassword(userId);
+            if (checkUser == null){
+                Transaction transaction = session.beginTransaction();
+                Password newUser = new Password();
+                newUser.setUserId(userId);
+                newUser.setPassword(password);
+                session.persist(newUser);
+                transaction.commit();
+                return newUser;
+            }else {
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public Password removeUserFromChat(Integer userId) {
+        return null;
+    }
+
+    @Override
+    public Password findUserIdFromPassword(Integer userId) {
+        try(Session session = factory.openSession()){
+            try {
+                Password user = session.get(Password.class,userId);
+                System.out.println("Пользователь найден.");
+                return user;
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Пользователь не найден.");
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public Channel loginToChat(String login, String password) {
+        return null;
     }
 
 }

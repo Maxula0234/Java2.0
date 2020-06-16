@@ -118,12 +118,14 @@ public class ChatApplication {
         MessagesDao messagesDao = new HibernateMessagesDao(HibernateUtils.getFactory());
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         ChannelDao channelDao = new HibernateChannelDao();
+        UsersDao usersDao = new HibernateUsersDao();
 
-        System.out.println("Enter id channel :");
+
+        System.out.println("Enter id user :");
         Integer channelId = Integer.parseInt(reader.readLine());
-        System.out.println("Enter ID user: ");
-        Integer userId = Integer.parseInt(reader.readLine());
-
-        channelDao.addUserToChannel(channelId,userId);
+//        System.out.println("Enter password user: ");
+//        String userId = reader.readLine();
+        usersDao.addUserToChat(1,"enot");
+        usersDao.findUserIdFromPassword(1);
     }
 }
