@@ -5,6 +5,7 @@ import org.levelup.chat.domain.ChannelDetails;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 public interface ChannelDao {
 

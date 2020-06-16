@@ -7,9 +7,10 @@ import org.levelup.chat.dao.UsersDao;
 import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.Password;
 import org.levelup.chat.domain.User;
+import org.levelup.chat.domain.UserChannel;
 import org.levelup.chat.hibernate.HibernateUtils;
+import org.w3c.dom.ls.LSOutput;
 
-import javax.lang.model.element.ModuleElement;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -140,8 +141,8 @@ public class HibernateUsersDao implements UsersDao {
     @Override
     public User checkLogin(String login) {
         try (Session session = factory.openSession()) {
-            List<User> users = session.createQuery("from Users where login = :login", User.class)
-                    .setParameter("login", login)
+            List<User> users = session.createQuery("from User where login = :log", User.class)
+                    .setParameter("log", login)
                     .getResultList();
             if (users.size() == 0) {
                 System.out.println(String.format("[log] Клиент с login = [%s] свободен", login));
@@ -358,9 +359,9 @@ public class HibernateUsersDao implements UsersDao {
 
     @Override
     public Password addUserToChat(Integer userId, String password) {
-        try (Session session = factory.openSession()){
+        try (Session session = factory.openSession()) {
             Password checkUser = findUserIdFromPassword(userId);
-            if (checkUser == null){
+            if (checkUser == null) {
                 Transaction transaction = session.beginTransaction();
                 Password newUser = new Password();
                 newUser.setUserId(userId);
@@ -368,7 +369,7 @@ public class HibernateUsersDao implements UsersDao {
                 session.persist(newUser);
                 transaction.commit();
                 return newUser;
-            }else {
+            } else {
                 System.out.println("Данный пользователь уже зарегистрирован");
                 return null;
             }
@@ -377,21 +378,21 @@ public class HibernateUsersDao implements UsersDao {
 
     @Override
     public void removeUserFromChat(Integer userId) {
-        try (Session session = factory.openSession()){
+        try (Session session = factory.openSession()) {
             Transaction transaction = session.beginTransaction();
             session.createQuery("DELETE Password where user_id = :userId")
-                    .setParameter("userId",userId)
+                    .setParameter("userId", userId)
                     .executeUpdate();
-            System.out.println(String.format("Удалили пользователя из чата %s",userId));
+            System.out.println(String.format("Удалили пользователя из чата %s", userId));
             transaction.commit();
         }
     }
 
     @Override
     public Password findUserIdFromPassword(Integer userId) {
-        try(Session session = factory.openSession()){
+        try (Session session = factory.openSession()) {
             try {
-                Password user = session.get(Password.class,userId);
+                Password user = session.get(Password.class, userId);
                 System.out.println("Пользователь найден.");
                 return user;
             } catch (Exception e) {
@@ -404,16 +405,16 @@ public class HibernateUsersDao implements UsersDao {
 
     @Override
     public Password updatePasswordFromUser(Integer userId, String oldPassword, String newPassword) {
-        try (Session session = factory.openSession()){
+        try (Session session = factory.openSession()) {
 
-            Password password = session.get(Password.class,userId);
-            if (password.getPassword().contains(oldPassword)){
+            Password password = session.get(Password.class, userId);
+            if (password.getPassword().contains(oldPassword)) {
                 Transaction transaction = session.beginTransaction();
                 password.setPassword(newPassword);
                 session.merge(password);
                 transaction.commit();
-                System.out.println(String.format("Изменили пароль для пользователя - %s [old - %s][new - %s]",password.getUser().getLogin(),oldPassword,newPassword));
-            }else {
+                System.out.println(String.format("Изменили пароль для пользователя - %s [old - %s][new - %s]", password.getUser().getLogin(), oldPassword, newPassword));
+            } else {
                 System.out.println("Старый пароль введен не верно. Изменение отклонено.");
                 return null;
             }
@@ -422,8 +423,35 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public Channel loginToChat(String login, String password) {
-        return null;
+    public String loginToChat(String login, String password) {
+        try (Session session = factory.openSession()) {
+            User user = checkLogin(login);
+            if (user != null) {
+                Password checkPass = findUserIdFromPassword(user.getId());
+                if (checkPass.getPassword().contains(password)){
+                    System.out.println("***Доступ разрещен");
+                    return "ok";
+                }else {
+                    System.out.println("***Доступ запрещен.");
+                    return "no";
+                }
+            } else {
+                System.out.println("***Доступ запрещен.");
+                return "no";
+            }
+        }
+    }
+
+    @Override
+    public Collection<UserChannel> allUserChannels(Integer userId) {
+        try (Session session = factory.openSession()) {
+
+            User user = session.get(User.class,userId);
+            Collection<UserChannel> allUserChannels = session.createQuery("from UserChannel where user_id = :userId",UserChannel.class)
+                    .setParameter("userId",userId)
+                    .getResultList();
+            return allUserChannels;
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package org.levelup.chat.dao;
 import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.Password;
 import org.levelup.chat.domain.User;
+import org.levelup.chat.domain.UserChannel;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -27,5 +28,8 @@ public interface UsersDao {
     Password findUserIdFromPassword(Integer userId);
     Password updatePasswordFromUser(Integer userId,String oldPassword, String newPassword);
     //Авторизация
-    Channel loginToChat(String login,String password);
+    String loginToChat(String login,String password);
+
+
+    Collection<UserChannel> allUserChannels(Integer userId);
 }

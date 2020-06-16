@@ -10,11 +10,15 @@ import org.levelup.chat.dao.impl.HibernateChannelDetailsDao;
 import org.levelup.chat.dao.impl.HibernateMessagesDao;
 import org.levelup.chat.dao.impl.HibernateUsersDao;
 import org.levelup.chat.domain.Channel;
+import org.levelup.chat.domain.Message;
 import org.levelup.chat.domain.User;
+import org.levelup.chat.domain.UserChannel;
 import org.levelup.chat.hibernate.HibernateUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.List;
 
 public class ChatApplication {
 
@@ -121,13 +125,19 @@ public class ChatApplication {
         UsersDao usersDao = new HibernateUsersDao();
 
 
-        System.out.println("Enter id user :");
-        Integer channelId = Integer.parseInt(reader.readLine());
-//        System.out.println("Enter password user: ");
-//        String userId = reader.readLine();
-//        usersDao.addUserToChat(1,"enot");
-//        usersDao.findUserIdFromPassword(1);
-//        usersDao.updatePasswordFromUser(1,"enot","eont1");
-        usersDao.removeUserFromChat(1);
+//        System.out.println("Enter id login :");
+//        String login = reader.readLine();
+//        System.out.println("Enter password: ");
+//        String password = reader.readLine();
+
+
+        String logAcces = usersDao.loginToChat("khorovinkin","s");
+
+        if (logAcces == "no"){
+            Collection<UserChannel> allChannel = usersDao.allUserChannels(1);
+            System.out.println(" ");
+        }else {
+            System.out.println("***Доступ запрещен.");
+        }
     }
 }

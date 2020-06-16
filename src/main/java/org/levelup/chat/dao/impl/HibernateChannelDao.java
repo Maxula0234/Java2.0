@@ -39,19 +39,19 @@ public class HibernateChannelDao implements ChannelDao {
     @Override
     public Channel createChannel(String name, String displayName) throws IOException {
         Session session = factory.openSession(); // open new connection to database
-        AtomicReference<Channel> channel = new AtomicReference<>();
+        Channel channel = new Channel();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         // Insert, update, delete
         Channel checkName = findByName(name);
         if (checkName == null) {
             Transaction transaction = session.beginTransaction();
-            channel.get().setName(name);
-            channel.get().setDisplayName(displayName);
+            channel.setName(name);
+            channel.setDisplayName(displayName);
             session.persist(channel); // insert into channel, add new row into table "channel"
             transaction.commit();
             session.close(); // close connection to database
             System.out.println(String.format("[log] Создан клиент: name = [%s], displayNam = [%s]",
-                    channel.get().getName(), channel.get().getDisplayName()));
+                    channel.getName(), channel.getDisplayName()));
         } else {
             System.out.println(String.format("Канал с именем [%s] уже существует.", name));
             System.out.println("[log] Введите новое имя канала - ");
@@ -60,7 +60,7 @@ public class HibernateChannelDao implements ChannelDao {
             String displayName2 = reader.readLine().toLowerCase();
             createChannel(nameChannel2, displayName2);
         }
-        return channel.get();
+        return channel;
     }
 
     @Override
