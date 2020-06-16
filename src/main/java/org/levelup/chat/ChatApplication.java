@@ -125,7 +125,9 @@ public class ChatApplication {
         Integer channelId = Integer.parseInt(reader.readLine());
 //        System.out.println("Enter password user: ");
 //        String userId = reader.readLine();
-        usersDao.addUserToChat(1,"enot");
-        usersDao.findUserIdFromPassword(1);
+//        usersDao.addUserToChat(1,"enot");
+//        usersDao.findUserIdFromPassword(1);
+//        usersDao.updatePasswordFromUser(1,"enot","eont1");
+        usersDao.removeUserFromChat(1);
     }
 }

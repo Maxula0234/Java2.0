@@ -9,6 +9,7 @@ import org.levelup.chat.domain.Password;
 import org.levelup.chat.domain.User;
 import org.levelup.chat.hibernate.HibernateUtils;
 
+import javax.lang.model.element.ModuleElement;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -368,14 +369,22 @@ public class HibernateUsersDao implements UsersDao {
                 transaction.commit();
                 return newUser;
             }else {
+                System.out.println("Данный пользователь уже зарегистрирован");
                 return null;
             }
         }
     }
 
     @Override
-    public Password removeUserFromChat(Integer userId) {
-        return null;
+    public void removeUserFromChat(Integer userId) {
+        try (Session session = factory.openSession()){
+            Transaction transaction = session.beginTransaction();
+            session.createQuery("DELETE Password where user_id = :userId")
+                    .setParameter("userId",userId)
+                    .executeUpdate();
+            System.out.println(String.format("Удалили пользователя из чата %s",userId));
+            transaction.commit();
+        }
     }
 
     @Override
@@ -390,6 +399,25 @@ public class HibernateUsersDao implements UsersDao {
                 System.out.println("Пользователь не найден.");
                 return null;
             }
+        }
+    }
+
+    @Override
+    public Password updatePasswordFromUser(Integer userId, String oldPassword, String newPassword) {
+        try (Session session = factory.openSession()){
+
+            Password password = session.get(Password.class,userId);
+            if (password.getPassword().contains(oldPassword)){
+                Transaction transaction = session.beginTransaction();
+                password.setPassword(newPassword);
+                session.merge(password);
+                transaction.commit();
+                System.out.println(String.format("Изменили пароль для пользователя - %s [old - %s][new - %s]",password.getUser().getLogin(),oldPassword,newPassword));
+            }else {
+                System.out.println("Старый пароль введен не верно. Изменение отклонено.");
+                return null;
+            }
+            return password;
         }
     }
 

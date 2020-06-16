@@ -19,6 +19,7 @@
         <mapping class="org.levelup.chat.domain.User"/>
         <mapping class="org.levelup.chat.domain.Message"/>
         <mapping class="org.levelup.chat.domain.ChannelDetails"/>
+        <mapping class="org.levelup.chat.domain.Password"/>
 
     </session-factory>
 </hibernate-configuration>

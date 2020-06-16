@@ -23,8 +23,9 @@ public interface UsersDao {
     User updateLoginUser(Integer id, String login) throws IOException;
     //Креды
     Password addUserToChat(Integer userId,String password);
-    Password removeUserFromChat(Integer userId);
+    void removeUserFromChat(Integer userId);
     Password findUserIdFromPassword(Integer userId);
+    Password updatePasswordFromUser(Integer userId,String oldPassword, String newPassword);
     //Авторизация
     Channel loginToChat(String login,String password);
 }
