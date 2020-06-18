@@ -9,12 +9,13 @@ import org.levelup.chat.dao.MessagesDao;
 import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.Message;
 import org.levelup.chat.domain.User;
+import org.levelup.chat.domain.UserChannel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class HibernateMessagesDao implements MessagesDao {
@@ -77,6 +78,17 @@ public class HibernateMessagesDao implements MessagesDao {
             session.persist(message);
 
             transaction.commit();
+        }
+    }
+
+    @Override
+    public List<Message> allUserMessageFromChannel(Integer channelId, Integer userId) {
+        try(Session session = factory.openSession()){
+            List<Message> allMessage = session.createQuery("from Message where user_id = :userId and channel_id = :channelId",Message.class)
+                    .setParameter("userId",userId)
+                    .setParameter("channelId",channelId)
+                    .getResultList();
+            return allMessage;
         }
     }
 

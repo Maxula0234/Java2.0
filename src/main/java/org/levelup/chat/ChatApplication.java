@@ -1,5 +1,6 @@
 package org.levelup.chat;
 
+import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import lombok.SneakyThrows;
 import org.levelup.chat.dao.ChannelDao;
 import org.levelup.chat.dao.ChannelDetailsDao;
@@ -18,6 +19,7 @@ import org.levelup.chat.hibernate.HibernateUtils;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ChatApplication {
@@ -123,6 +125,8 @@ public class ChatApplication {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         ChannelDao channelDao = new HibernateChannelDao();
         UsersDao usersDao = new HibernateUsersDao();
+        List<String> userChannel = new LinkedList<>();
+        Collection<Channel> userChannels = new LinkedList<>();
 
 
 //        System.out.println("Enter id login :");
@@ -131,11 +135,32 @@ public class ChatApplication {
 //        String password = reader.readLine();
 
 
-        String logAcces = usersDao.loginToChat("khorovinkin","s");
+        User logAcces = usersDao.loginToChat("khorovinkin","qwerty");
 
-        if (logAcces == "no"){
+        if (logAcces != null){
             Collection<UserChannel> allChannel = usersDao.allUserChannels(1);
-            System.out.println(" ");
+            allChannel.forEach(s -> {
+                Channel ch = channelDao.findById(s.getChannelId());
+                userChannels.add(ch);
+                userChannel.add(ch.getDisplayName());
+            });
+            userChannel.forEach(s -> {
+                System.out.println(String.format("Доступен канал: %s",s));
+            });
+
+            System.out.println("Выберите канал.(введите название из списка)");
+            String selectChannel = reader.readLine();
+            System.out.println(String.format("Выбран канал - %s",selectChannel));
+
+            Channel selectedChannel = userChannels.stream().filter(s -> s.getDisplayName().contains(selectChannel)).findFirst().get();
+
+            List<Message> usersMessageFromChanel = messagesDao.allUserMessageFromChannel(logAcces.getId(),selectedChannel.getId());
+            usersMessageFromChanel.forEach(message -> System.out.println(message.getText()));
+            System.out.println("***Введите сообщение: ");
+            String newMessage = reader.readLine();
+
+            messagesDao.sendMessage(logAcces,selectedChannel,newMessage);
+
         }else {
             System.out.println("***Доступ запрещен.");
         }

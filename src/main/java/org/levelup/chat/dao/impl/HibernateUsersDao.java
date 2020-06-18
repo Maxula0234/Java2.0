@@ -423,21 +423,21 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public String loginToChat(String login, String password) {
+    public User loginToChat(String login, String password) {
         try (Session session = factory.openSession()) {
             User user = checkLogin(login);
             if (user != null) {
                 Password checkPass = findUserIdFromPassword(user.getId());
                 if (checkPass.getPassword().contains(password)){
                     System.out.println("***Доступ разрещен");
-                    return "ok";
+                    return user;
                 }else {
                     System.out.println("***Доступ запрещен.");
-                    return "no";
+                    return null;
                 }
             } else {
                 System.out.println("***Доступ запрещен.");
-                return "no";
+                return null;
             }
         }
     }

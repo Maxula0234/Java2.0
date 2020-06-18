@@ -28,7 +28,7 @@ public interface UsersDao {
     Password findUserIdFromPassword(Integer userId);
     Password updatePasswordFromUser(Integer userId,String oldPassword, String newPassword);
     //Авторизация
-    String loginToChat(String login,String password);
+    User loginToChat(String login,String password);
 
 
     Collection<UserChannel> allUserChannels(Integer userId);
