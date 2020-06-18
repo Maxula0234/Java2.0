@@ -1,8 +1,10 @@
 package org.levelup.chat.dao.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.levelup.chat.dao.ChannelDao;
 import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.User;
@@ -28,16 +30,13 @@ import java.util.concurrent.atomic.AtomicReference;
 //      -> findByName (getByName)
 //      -> findByField (getByField)
 
+@RequiredArgsConstructor
 public class HibernateChannelDao implements ChannelDao {
 
     private final SessionFactory factory;
 
-    public HibernateChannelDao() {
-        this.factory = HibernateUtils.getFactory();
-    }
-
     @Override
-    public Channel createChannel(String name, String displayName) throws IOException {
+    public Channel createChannel(String name, String displayName) throws IllegalAccessException {
         Session session = factory.openSession(); // open new connection to database
         Channel channel = new Channel();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -53,12 +52,7 @@ public class HibernateChannelDao implements ChannelDao {
             System.out.println(String.format("[log] Создан клиент: name = [%s], displayNam = [%s]",
                     channel.getName(), channel.getDisplayName()));
         } else {
-            System.out.println(String.format("Канал с именем [%s] уже существует.", name));
-            System.out.println("[log] Введите новое имя канала - ");
-            String nameChannel2 = reader.readLine();
-            System.out.println("[log] Введите новое displayName канала - ");
-            String displayName2 = reader.readLine().toLowerCase();
-            createChannel(nameChannel2, displayName2);
+            throw new IllegalAccessException("Канал с данным именем уже существует.");
         }
         return channel;
     }

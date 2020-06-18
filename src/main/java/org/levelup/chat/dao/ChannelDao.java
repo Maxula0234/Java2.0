@@ -10,7 +10,7 @@ import java.util.List;
 public interface ChannelDao {
 
     // method name "create..." -> метод должен вернуть то, что он создал
-    Channel createChannel(String name, String displayName) throws IOException;
+    Channel createChannel(String name, String displayName) throws IOException, IllegalAccessException;
     Collection<Channel> findAll();
     void removeByName(String name);
     Channel findByName(String name);

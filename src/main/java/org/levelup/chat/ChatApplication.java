@@ -123,7 +123,7 @@ public class ChatApplication {
     public static void main(String[] args) {
         MessagesDao messagesDao = new HibernateMessagesDao(HibernateUtils.getFactory());
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        ChannelDao channelDao = new HibernateChannelDao();
+        ChannelDao channelDao = new HibernateChannelDao(HibernateUtils.getFactory());
         UsersDao usersDao = new HibernateUsersDao();
         List<String> userChannel = new LinkedList<>();
         Collection<Channel> userChannels = new LinkedList<>();
@@ -151,7 +151,6 @@ public class ChatApplication {
             System.out.println("Выберите канал.(введите название из списка)");
             String selectChannel = reader.readLine();
             System.out.println(String.format("Выбран канал - %s",selectChannel));
-
             Channel selectedChannel = userChannels.stream().filter(s -> s.getDisplayName().contains(selectChannel)).findFirst().get();
 
             List<Message> usersMessageFromChanel = messagesDao.allUserMessageFromChannel(logAcces.getId(),selectedChannel.getId());
