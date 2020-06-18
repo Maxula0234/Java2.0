@@ -22,14 +22,11 @@ public class HibernateMessageDaoTestIT {
         dao = new HibernateMessagesDao(factory);
     }
 
-
     @Test
     public void testSendMessage_whenDataIsValide_thenCreateMessageInDB() {
         User user = createUser("login1", "firstName1", "lastName1");
         Channel channel = createChannel("channel1", "CH1");
-
         dao.sendMessage(user, channel, "some message");
-
         Session session = factory.openSession();
         List<Message> messages = session.createQuery("from Message", Message.class)
                 .getResultList();
