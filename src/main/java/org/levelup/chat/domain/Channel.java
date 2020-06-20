@@ -9,10 +9,15 @@ import java.util.Collection;
 @Entity
 @Data
 @ToString
-@NoArgsConstructor
+//@NoArgsConstructor
 @Table(name = "channel")
 public class Channel {
 
+  public Channel(){}
+  public Channel(String name,String displayName){
+    this.name = name;
+    this.displayName = displayName;
+  }
   //identity
   // insert() -> next_val('seq') , name , displayName
 

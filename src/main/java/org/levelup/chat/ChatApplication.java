@@ -124,7 +124,7 @@ public class ChatApplication {
         MessagesDao messagesDao = new HibernateMessagesDao(HibernateUtils.getFactory());
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         ChannelDao channelDao = new HibernateChannelDao(HibernateUtils.getFactory());
-        UsersDao usersDao = new HibernateUsersDao();
+        UsersDao usersDao = new HibernateUsersDao(HibernateUtils.getFactory());
         List<String> userChannel = new LinkedList<>();
         Collection<Channel> userChannels = new LinkedList<>();
 

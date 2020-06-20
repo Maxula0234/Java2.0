@@ -1,5 +1,7 @@
 package org.levelup.chat.dao.impl;
 
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -18,12 +20,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+@RequiredArgsConstructor
 public class HibernateUsersDao implements UsersDao {
     private final SessionFactory factory;
 
-    public HibernateUsersDao() {
-        this.factory = HibernateUtils.getFactory();
-    }
+//    public HibernateUsersDao() {
+//        this.factory = HibernateUtils.getFactory();
+//    }
+
 
     @Override
     public Collection<User> findAllUsers() {
@@ -37,70 +41,39 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public User findByLogin() throws IOException {
+    public User findByLogin(String login) throws IOException {
         try (Session session = factory.openSession()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            AtomicReference<User> user = new AtomicReference<>();
             System.out.println("Введите логин");
-            String login = reader.readLine();
-            List<User> users = session.createQuery("from Users where login = :login", User.class)
+            List<User> users = session.createQuery("from User where login = :login", User.class)
                     .setParameter("login", login)
                     .getResultList();
-            if (users == null) {
+            if (users.size() == 0) {
                 System.out.println(String.format("[log] Клиент с login = [%s] не найден", login));
-                System.out.println("[log] Хотите попробовать найти другой логин? - y/n");
-                String yn = reader.readLine().toLowerCase();
-                switch (yn) {
-                    case "y": {
-                        System.out.println("[log] Введите новый логин - ");
-                        String newLogin = reader.readLine();
-                        findByLogin();
-                    }
-                    case "n": {
-                        System.out.println("[log] Программа завершена....");
-                        return null;
-                    }
-                }
+                return null;
             } else {
-                user.set(users.get(0));
+                User user = users.get(0);
                 System.out.println(String.format("[log] Клиент найден. [login - %s],[firstName - %s],[lastName - %s]",
-                        user.get().getLogin(), user.get().getFirstName(), user.get().getLastName()));
+                        user.getLogin(), user.getFirstName(), user.getLastName()));
+                return user;
             }
-            return user.get();
         }
     }
 
     @Override
     public User findById(int id) throws IOException {
         try (Session session = factory.openSession()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            AtomicReference<User> user = new AtomicReference<>();
             List<User> users = session.createQuery("from Users where id = :id", User.class)
                     .setParameter("id", id)
                     .getResultList();
             if (users.isEmpty()) {
                 System.out.println(String.format("Клиент с id = [%s] не найден", id));
-                System.out.println("[log] Хотите попробовать найти другой id? - y/n");
-                String yn = reader.readLine().toLowerCase();
-                switch (yn) {
-                    case "y": {
-                        System.out.println("[log] Введите новый id(int) - ");
-                        String newLogin = reader.readLine();
-                        user.set(findById(Integer.parseInt(newLogin)));
-                        break;
-                    }
-                    case "n": {
-                        System.out.println("[log] Программа завершена....");
-                        return null;
-                    }
-                }
+               return null;
             } else {
-                user.set(users.get(0));
+                User user = users.get(0);
                 System.out.println(String.format("Клиент найден - [id = %s],[firstName = %s],[lastName = %s],[login = %s].",
-                        user.get().getId(), user.get().getFirstName(), user.get().getLastName(), user.get().getLogin()));
-                return user.get();
+                        user.getId(), user.getFirstName(), user.getLastName(), user.getLogin()));
+                return user;
             }
-            return user.get();
         }
     }
 
@@ -233,17 +206,10 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public User createUsers() throws IOException {
+    public User createUsers(String firstName, String lastName, String login) throws IOException {
         try (Session session = factory.openSession()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             AtomicReference<User> newUser = new AtomicReference<>();
 
-            System.out.println("Введите имя.");
-            String firstName = reader.readLine();
-            System.out.println("Введите фамилию.");
-            String lastName = reader.readLine();
-            System.out.println("Введите login.");
-            String login = reader.readLine();
             User checkLogin = checkLogin(login.toLowerCase());
             if (checkLogin == null) {
                 Transaction transaction = session.beginTransaction();
@@ -259,17 +225,6 @@ public class HibernateUsersDao implements UsersDao {
                         newUser.get().getFirstName(), newUser.get().getLastName(), newUser.get().getLogin()));
             } else {
                 System.out.println("Попробовать снова? y/n");
-                String yn = reader.readLine().toLowerCase();
-                switch (yn) {
-                    case "y": {
-                        newUser.set(createUsers());
-                        break;
-                    }
-                    case "n": {
-                        System.out.println("Программа завершена.....");
-                        return null;
-                    }
-                }
             }
             return newUser.get();
         }
