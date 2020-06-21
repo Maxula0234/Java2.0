@@ -1,17 +1,13 @@
 package org.levelup.chat.dao.impl;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.levelup.chat.dao.UsersDao;
-import org.levelup.chat.domain.Channel;
 import org.levelup.chat.domain.Password;
 import org.levelup.chat.domain.User;
 import org.levelup.chat.domain.UserChannel;
-import org.levelup.chat.hibernate.HibernateUtils;
-import org.w3c.dom.ls.LSOutput;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +28,7 @@ public class HibernateUsersDao implements UsersDao {
     @Override
     public Collection<User> findAllUsers() {
         Session session = factory.openSession();
-        Collection<User> allUsers = session.createQuery("from Users", User.class).getResultList();
+        Collection<User> allUsers = session.createQuery("from User", User.class).getResultList();
         session.close();
         allUsers.stream()
                 .forEach(s -> System.out.println(String.format("[log] [id = %s][firstName - %s], [lastName - %s], [login - %s]",
@@ -62,12 +58,12 @@ public class HibernateUsersDao implements UsersDao {
     @Override
     public User findById(int id) throws IOException {
         try (Session session = factory.openSession()) {
-            List<User> users = session.createQuery("from Users where id = :id", User.class)
+            List<User> users = session.createQuery("from User where id = :id", User.class)
                     .setParameter("id", id)
                     .getResultList();
             if (users.isEmpty()) {
                 System.out.println(String.format("Клиент с id = [%s] не найден", id));
-               return null;
+                return null;
             } else {
                 User user = users.get(0);
                 System.out.println(String.format("Клиент найден - [id = %s],[firstName = %s],[lastName = %s],[login = %s].",
@@ -128,77 +124,23 @@ public class HibernateUsersDao implements UsersDao {
     }
 
     @Override
-    public void removeById() throws IOException {
-        try (Session session = factory.openSession()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            Collection<User> allUsers = findAllUsers();
-            System.out.println("[log] Введите id пользователя, которого необходимо удалить.");
-            String delId = reader.readLine();
-            User user = findById(Integer.parseInt(delId));
-            if (user != null) {
-                System.out.println(String.format("[log] Клиент найден: " +
-                        "firstName = [%s], " +
-                        "lastName = [%s], " +
-                        "login = [%s]", user.getFirstName(), user.getLastName(), user.getLogin()));
-                System.out.println("Вы уверены что хотите удалить? Введите y/n");
-                String __case = reader.readLine().toLowerCase();
-                switch (__case) {
-                    case "y": {
-                        Transaction transaction = session.beginTransaction();
-                        session.createQuery("DELETE Users where id = :idUsers")
-                                .setParameter("idUsers", Integer.parseInt(delId))
-                                .executeUpdate();
-                        System.out.println(String.format("[log] Удалили пользователя: " +
-                                "firstName = [%s], " +
-                                "lastName = [%s], " +
-                                "login = [%s]", user.getFirstName(), user.getLastName(), user.getLogin()));
-                        transaction.commit();
-                        break;
-                    }
-                    case "n": {
-                        System.out.println("Клиент не удален, программа завершена......");
-                        break;
-                    }
-                }
-            } else {
-                System.out.println(String.format("Клиент с id -  [%s] не найден", delId));
-            }
-        }
-    }
-
-    @Override
     public void removeById(int id) throws IOException {
         try (Session session = factory.openSession()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             Collection<User> allUsers = findAllUsers();
             System.out.println("[log] Введите id пользователя, которого необходимо удалить.");
-            String delId = reader.readLine();
-            User user = findById(Integer.parseInt(delId));
+            User user = findById(id);
             if (user != null) {
                 System.out.println(String.format("[log] Клиент найден: " +
                         "firstName = [%s], " +
                         "lastName = [%s], " +
                         "login = [%s]", user.getFirstName(), user.getLastName(), user.getLogin()));
-                System.out.println("Вы уверены что хотите удалить? Введите y/n");
-                String __case = reader.readLine().toLowerCase();
-                switch (__case) {
-                    case "y": {
-                        Transaction transaction = session.beginTransaction();
-                        session.createQuery("DELETE Users where id = :idUsers")
-                                .setParameter("idUsers", id)
-                                .executeUpdate();
-                        transaction.commit();
-                        System.out.println(String.format("[log] Удалили пользователя: " +
-                                "firstName = [%s], " +
-                                "lastName = [%s], " +
-                                "login = [%s]", user.getFirstName(), user.getLastName(), user.getLogin()));
-                        break;
-                    }
-                    case "n": {
-                        System.out.println("Клиент не удален, программа завершена......");
-                        break;
-                    }
-                }
+
+                Transaction transaction = session.beginTransaction();
+                session.createQuery("DELETE User where id = :idUsers")
+                        .setParameter("idUsers", id)
+                        .executeUpdate();
+                transaction.commit();
+
             } else {
                 System.out.println(String.format("Клиент с id -  [%s] не найден", id));
             }
@@ -383,10 +325,10 @@ public class HibernateUsersDao implements UsersDao {
             User user = checkLogin(login);
             if (user != null) {
                 Password checkPass = findUserIdFromPassword(user.getId());
-                if (checkPass.getPassword().contains(password)){
+                if (checkPass.getPassword().contains(password)) {
                     System.out.println("***Доступ разрещен");
                     return user;
-                }else {
+                } else {
                     System.out.println("***Доступ запрещен.");
                     return null;
                 }
@@ -401,9 +343,9 @@ public class HibernateUsersDao implements UsersDao {
     public Collection<UserChannel> allUserChannels(Integer userId) {
         try (Session session = factory.openSession()) {
 
-            User user = session.get(User.class,userId);
-            Collection<UserChannel> allUserChannels = session.createQuery("from UserChannel where user_id = :userId",UserChannel.class)
-                    .setParameter("userId",userId)
+            User user = session.get(User.class, userId);
+            Collection<UserChannel> allUserChannels = session.createQuery("from UserChannel where user_id = :userId", UserChannel.class)
+                    .setParameter("userId", userId)
                     .getResultList();
             return allUserChannels;
         }

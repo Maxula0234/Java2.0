@@ -13,7 +13,6 @@ public interface UsersDao {
     Collection<User> findAllUsers();
     User findByLogin(String login) throws IOException;
     void removeById(int id) throws IOException;
-    void removeById()throws IOException;
     User createUsers(String firstName, String lastName, String login) throws IOException;
     User findById(int id) throws IOException;
     User checkLogin(String login);
