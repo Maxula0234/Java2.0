@@ -14,6 +14,9 @@ import java.util.Collection;
 public class Channel {
 
   public Channel(){}
+  public Channel(String name){
+    this.name = name;
+  }
   public Channel(String name,String displayName){
     this.name = name;
     this.displayName = displayName;
