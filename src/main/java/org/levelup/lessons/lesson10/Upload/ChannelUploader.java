@@ -39,15 +39,12 @@ public class ChannelUploader {
     @RequiredArgsConstructor
     private class ChannelIteratior {
         private final Iterator<Channel> iterator;
-
         synchronized Channel next() {
             return iterator.next();
         }
-
         synchronized boolean hasNext() {
             return iterator.hasNext();
         }
-
         synchronized Channel getNextOrNull() {
             synchronized (iterator) {
                 return iterator.hasNext() ? iterator.next() : null;
