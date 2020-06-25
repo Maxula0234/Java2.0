@@ -9,7 +9,7 @@ public class ReentrantCounter {
     private ReentrantLock lock;
     private int counter;
     public ReentrantCounter() {
-        this.lock = new ReentrantLock(false);
+        this.lock = new ReentrantLock(true);
     }
     //synchronized(this) {counter++;}
 
