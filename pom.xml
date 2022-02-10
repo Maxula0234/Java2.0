@@ -11,7 +11,7 @@
     <properties>
         <java.version>11</java.version>
         <postgres.driver.version>42.2.12</postgres.driver.version>
-        <hibernate.version>5.4.17.Final</hibernate.version>
+        <hibernate.version>5.4.24.Final</hibernate.version>
         <lombok.version>1.18.12</lombok.version>
         <junit.version>5.4.0</junit.version>
         <mockito.version>3.0.0</mockito.version>
